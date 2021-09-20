@@ -48,18 +48,21 @@ korda n f x = f (korda (n - 1) f x)
 inc : Int -> Int
 inc x = x + 1
 
--- add : Int -> Int -> Int
--- add x 0 = x
--- add x y = f x y
+add : Int -> Int -> Int
+add x y = korda x inc y
+
+mul : Int -> Int -> Int
+mul x 0 = 0
+mul 0 x = 0
+mul x y = ?rhs_mul
 
 aste : Int -> Int -> Int
 aste x 0 = 1
 aste 0 n = 0
 aste x n = x * aste x (n - 1)
 
--- p : Int -> Int -> Int
--- p n 1 = 1
--- p n 0 = 0
+p : Int -> Int -> Int
+p n k = ?rhs_p
 
 c : Int -> Int -> Int
 c n 0 = 1
@@ -90,4 +93,3 @@ ndiv x y = f x 0
                 z
             else
                 f (n - y) (z + 1)
-
