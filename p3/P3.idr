@@ -15,21 +15,19 @@ nullid1 (x :: xs) =
         nullid1 xs
 
 nullid2 : List Int -> Int
-nullid2 xs = foldr f 0 xs
-    where f : Int -> Int -> Int
-          f a b = if a == 0 then b+1 else b
+nullid2 xs = foldr (\ a, b => if a == 0 then b+1 else b ) 0 xs
 
 nullid3 : List Int -> Int
-nullid3 xs = ?rhs_nullid3
+nullid3 xs = sum (map (\ x => if x == 0 then 1 else 0) xs)
 
 nullid4 : List Int -> Int
-nullid4 xs = ?rhs_nullid4
+nullid4 xs = cast (length (filter (==0) xs))
 
 nullid5 : List Int -> Int
-nullid5 xs = ?rhs_nullid5
+nullid5 xs = cast (length [x | x <- xs, x == 0])
 
 length' : List a -> Int
-length' a = ?rhs_length'
+length' a = foldl (\ b, a => b + 1) 0 a
 
 productList : List Int -> Int
 productList xs = foldr (\ a, b => a * b) 1 xs
@@ -43,5 +41,13 @@ productList [3,2,0]
 append' : List a -> List a -> List a
 append' xs ys = ?rhs_append'
 
+isEven : Nat -> Bool
+isEven Z         = True
+isEven (S Z)     = False
+isEven (S (S n)) = isEven n
+
 all' : (a -> Bool) -> List a -> Bool
 all' f a = ?rhs_all'
+
+-- all' isEven [1, 2, 3] == False
+-- all' isEven [2, 4, 6] == True
