@@ -9,7 +9,7 @@ filter f (x :: xs) =
 nullid1 : List Int -> Int
 nullid1 []        = 0
 nullid1 (x :: xs) = 
-    if 0 == x then
+    if x == 0 then
         1 + nullid1 xs
     else
         nullid1 xs
@@ -39,7 +39,7 @@ productList [3,2,0]
 -}
 
 append' : List a -> List a -> List a
-append' xs ys = ?rhs_append'
+append' xs ys = foldr (\ x, b => x :: b) xs ys
 
 isEven : Nat -> Bool
 isEven Z         = True
@@ -47,7 +47,57 @@ isEven (S Z)     = False
 isEven (S (S n)) = isEven n
 
 all' : (a -> Bool) -> List a -> Bool
-all' f a = ?rhs_all'
+all' f a  = foldr (\ x, y => if f x == False then False else y) True a
 
--- all' isEven [1, 2, 3] == False
--- all' isEven [2, 4, 6] == True
+reverse' : List a -> List a
+reverse' xs = foldl rev df xs
+  where
+    df : List a
+    df = []
+    rev : List a -> a -> List a
+    rev x y = y :: x
+
+reverse2 : List a -> List a
+reverse2 xs = foldl (\ a, b => b :: a) [] xs
+
+eemaldaNullid : List Int -> List Int
+eemaldaNullid xs = foldr rem df xs
+  where
+    df : List Int
+    df = []
+    rem : Int -> List Int -> List Int
+    rem x y = if x == 0 then y else x :: y
+
+eemaldaNullid2 : List Int -> List Int
+eemaldaNullid2 xs = foldr (\ a, b => if a==0 then b else a :: b) [] xs
+
+allEqual : List Int -> Bool
+allEqual []        = True
+allEqual (x :: xs) = x == valChange x xs || False
+    where
+        valChange : Int -> List Int -> Int
+        valChange x xs = foldr (\ a, b => if a == x then b else a) x xs
+
+unzip' : List (a, b) -> (List a, List b)
+unzip' [] = ([], [])
+unzip' xs = foldr f x xs
+  where
+    x : (List a, List b)
+    x = ([], [])
+    f : (a, b) -> (List a, List b) -> (List a, List b)
+    f (a, b) (as, bs) = (a :: as, b :: bs)
+
+removeAll1 : Int -> List Int -> List Int
+removeAll1 n xs = foldr (\ x, y => if x == n then y else x :: y) [] xs
+
+removeAll2 : Int -> List Int -> List Int
+removeAll2 n xs = filter (\ x => if x==n then False else True) xs
+
+removeAll3 : Int -> List Int -> List Int
+removeAll3 n xs = [x | x <- xs, not x n]
+    where
+        not : Int -> Int -> Bool
+        not x y = if x == y then False else True
+
+any' : (a -> Bool) -> List a -> Bool
+any' p xs = foldr (\ x, y => p x || y) False xs
