@@ -39,7 +39,7 @@ productList [3,2,0]
 -}
 
 append' : List a -> List a -> List a
-append' xs ys = foldr (\ x, b => x :: b) xs ys
+append' xs ys = foldr (\ x, b => x :: b) ys xs
 
 isEven : Nat -> Bool
 isEven Z         = True
