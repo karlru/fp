@@ -84,7 +84,7 @@ list2tree [] = Leaf
 list2tree x  = treeRec (splitAt ((div) (length x) 2) x)
   where
     treeRec : (List a, List a) -> Tree a
-    treeRec ([], [])    = ?rhs2
-    treeRec (x::xs, []) = ?rhs
+    treeRec ([], [])    = ?rhs_treeRec_1
+    treeRec (x::xs, []) = ?rhs_treeRec_2
     treeRec (x::[], []) = (Branch Leaf x Leaf)
     treeRec (x, y::ys)  = (Branch (list2tree x) y (list2tree ys))
