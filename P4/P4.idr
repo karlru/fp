@@ -1,3 +1,6 @@
+import Data.List
+import Data.Nat
+
 data Email = E String String
  
 varmo     : Email
@@ -77,5 +80,11 @@ tree2list Leaf             = []
 tree2list (Branch t1 x t2) = tree2list t1 ++ [x] ++ tree2list t2
 
 list2tree : List a -> Tree a
-list2tree []        = Leaf
-list2tree (x :: xs) = ?rhs_list2tree
+list2tree [] = Leaf
+list2tree x  = treeRec (splitAt ((div) (length x) 2) x)
+  where
+    treeRec : (List a, List a) -> Tree a
+    treeRec ([], [])    = ?rhs2
+    treeRec (x::xs, []) = ?rhs
+    treeRec (x::[], []) = (Branch Leaf x Leaf)
+    treeRec (x, y::ys)  = (Branch (list2tree x) y (list2tree ys))
