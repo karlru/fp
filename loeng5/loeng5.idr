@@ -22,7 +22,7 @@ tüübiklassid
         equalString : String -> String -> Bool
     seda ei saa kirjutada parameetrilise polümorfse funktsiooniga, kuna funktsioonide implementatsioon on erinev
     selleks saab teha aga liidese (Haskellis tüübiklass)
-        interface Equl a where
+        interface Equal a where
             (==) : a -> a -> Bool
         Equal Int where
             a == b = ... #intide võrdsus
