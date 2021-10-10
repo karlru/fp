@@ -73,13 +73,22 @@ expr1 : Expr
 expr1 = Div (Add (Const 3) (Const 1)) (Const 2)
 expr2 : Expr
 expr2 = Add (Const 1) (Div (Const 1) (Add (Const 1) (Const (-1))))
+expr3 : Expr
+expr3 = Div (Const 5) (Const 1)
 
 evalExpr : Expr -> Maybe Int
-evalExpr (Const x) = ?rhs_evalExpr_1
-evalExpr (Add x y) = ?rhs_evalExpr_2
+evalExpr (Const x) = do
+    pure x
+evalExpr (Add x y) = do
+    pure ((evalExpr x) * (evalExpr y))
 evalExpr (Div x y) = do
     xv <- evalExpr x
     yv <- evalExpr y
     if yv == 0 
         then Nothing
-        else Just (xv `div` yv)
+        else (Just (xv `div` yv))
+
+testMul : Maybe Int -> Maybe Int -> Maybe Int
+testMul x y = do x' <- x
+                 y' <- y
+                 pure (x' * y')
