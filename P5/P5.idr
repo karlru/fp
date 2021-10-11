@@ -1,5 +1,3 @@
-module P5
-
 import System
 
 data Tree a = Leaf | Branch (Tree a) a (Tree a)
@@ -78,14 +76,8 @@ summaN2 = do
     xs <- sequence (map (\a => loeArv) [1..n])
     putStrLn (show (sum xs))
 
-randomInt : IO (Nat)
-randomInt = do 
-    secs <- time
-    pure (the Nat (1 + mod (cast secs) 100))
-
 m2ng : IO ()
-m2ng = do
-    x <- Random Int
+m2ng = ?rhs_m4ng
 
 data Expr = Const Int | Add Expr Expr | Div Expr Expr
  
