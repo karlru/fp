@@ -1,3 +1,7 @@
+module P5
+
+import System
+
 data Tree a = Leaf | Branch (Tree a) a (Tree a)
  
 Eq a => Eq (Tree a) where
@@ -58,7 +62,14 @@ summaN1 : IO ()
 summaN1 = do
     putStrLn "Liidetavate arv"
     n <- loeArv
-    pure ()
+    h <- summaRec n
+    putStrLn (show(h))
+    where
+        summaRec : Int -> IO Int
+        summaRec 0 = pure 0
+        summaRec x = do
+            y <- loeArv
+            pure (y)
  
 summaN2 : IO ()
 summaN2 = do
@@ -66,6 +77,15 @@ summaN2 = do
     n <- loeArv
     xs <- sequence (map (\a => loeArv) [1..n])
     putStrLn (show (sum xs))
+
+randomInt : IO (Nat)
+randomInt = do 
+    secs <- time
+    pure (the Nat (1 + mod (cast secs) 100))
+
+m2ng : IO ()
+m2ng = do
+    x <- Random Int
 
 data Expr = Const Int | Add Expr Expr | Div Expr Expr
  
@@ -77,18 +97,12 @@ expr3 : Expr
 expr3 = Div (Const 5) (Const 1)
 
 evalExpr : Expr -> Maybe Int
-evalExpr (Const x) = do
-    pure x
+evalExpr (Const x) = pure x
 evalExpr (Add x y) = do
-    pure ((evalExpr x) * (evalExpr y))
+    x' <- evalExpr x
+    y' <- evalExpr y
+    pure (x' + y')
 evalExpr (Div x y) = do
-    xv <- evalExpr x
-    yv <- evalExpr y
-    if yv == 0 
-        then Nothing
-        else (Just (xv `div` yv))
-
-testMul : Maybe Int -> Maybe Int -> Maybe Int
-testMul x y = do x' <- x
-                 y' <- y
-                 pure (x' * y')
+    x' <- evalExpr x
+    y' <- evalExpr y
+    if y' == 0 then Nothing else pure (x' `div` y')
