@@ -16,7 +16,7 @@ Foldable Tree where
   foldr f b (Branch x y z) =  foldr f (f y (foldr f b z)) x
 
 len : Foldable t => t a -> Int
-len t = ?q
+len t = foldr (\ x, y => y + 1) 0 t
 
 dialoog : IO ()
 dialoog = do
@@ -60,14 +60,14 @@ summaN1 : IO ()
 summaN1 = do
     putStrLn "Liidetavate arv"
     n <- loeArv
-    h <- summaRec n
+    h <- summaRec n 0
     putStrLn (show(h))
     where
-        summaRec : Int -> IO Int
-        summaRec 0 = pure 0
-        summaRec x = do
-            y <- loeArv
-            pure (y)
+        summaRec : Int -> Int -> IO Int
+        summaRec 0 y = pure y
+        summaRec x y = do
+            z <- loeArv
+            summaRec (x - 1) (y + z)
  
 summaN2 : IO ()
 summaN2 = do
@@ -77,7 +77,27 @@ summaN2 = do
     putStrLn (show (sum xs))
 
 m2ng : IO ()
-m2ng = ?rhs_m4ng
+m2ng = do
+    putStrLn "Arva ära täisarv vahemikus nullist sajani!"
+    rand <- randomRIO ((the Int 0), (the Int 100))
+    p <- paku rand 1
+    putStr "Ära arvasid! Oligi "
+    putStr (show(rand))
+    putStr ". Pakkusid "
+    putStr (show(p))
+    putStrLn " korda."
+    where
+        paku : Int -> Int -> IO Int
+        paku x y = do
+            pakkumine <- loeArv
+            case pakkumine == x of
+                True => 
+                    pure y
+                False => do
+                    if pakkumine > x 
+                        then putStrLn "Ei! Minu arv on väiksem" 
+                        else putStrLn "Ei! Minu arv on suurem"
+                    paku x (y + 1)
 
 data Expr = Const Int | Add Expr Expr | Div Expr Expr
  
