@@ -24,53 +24,47 @@ Eq Term where
     (Con x)   == (Con y)   = x==y
     _         == _         = False
 
-tI : Term
+tI : Term    -- show tI == "\ a. a"
 tI = Lam "a" (Var "a")
  
-tK : Term
+tK : Term    -- show tK == "\ a. \ b. a"
 tK = Lam "a" (Lam "b" (Var "a"))
  
-tS : Term
+tS : Term    -- show tS == "\ a. \ b. \ c. a c (b c)"
 tS = Lam "a" (Lam "b" (Lam "c"
         (App (App (Var "a") (Var "c"))
             (App (Var "b") (Var "c")))))
  
-test : Term
+test : Term   -- "(\ a. \ b. \ c. a c (b c)) (\ a. a) (\ a. a) (\ a. a)"
 test = App (App (App tS tI) tI) tI
  
-test1 : Term
+test1 : Term  -- "(\ a. a) ((\ b. b) (\ c. c))"
 test1 = (Lam "a" (Var "a")) `App`
     ((Lam "b" (Var "b")) `App` (Lam "c" (Var "c")))
  
 add : Term -> Term -> Term
 add x y = App (App (Var "add") x) y
  
-test2 : Term
+test2 : Term  -- show test2 == "add 1 2"
 test2 = add (Con 1) (Con 2)
  
-test3 : Term
+test3 : Term  -- "add (add 1 2) (add (add 1 1) 3)"
 test3 = add (add (Con 1) (Con 2)) (add (add (Con 1) (Con 1)) (Con 3))
  
-test4 : Term
+test4 : Term  -- show test4 == "(\ x. add x x) (add 1 2)"
 test4 = App (Lam "x" (add (Var "x") (Var "x"))) (add (Con 1) (Con 2))
  
 selfapp : Term
 selfapp = Lam "y" (App (Var "y") (Var "y"))
  
-test5 : Term
+test5 : Term  -- "(\ x. 5) ((\ y. y y) (\ y. y y))"
 test5 = App (Lam "x" (Con 5)) (App selfapp selfapp)
  
-test6 : Term
+test6 : Term  -- show test6 == "\ x. y"
 test6 = Lam "x" (Var "y")
  
-test7 : Term
+test7 : Term  -- show test7 == "(\ a. a) 5"
 test7 = App tI (Con 5)
-
-test8 : Term
-test8 = Var "y"
-
-test9 : Term
-test9 = Con 4
 
 -- vaadata loeng3.pdf slaid 35 (vabade muutujate induktiivne definitsioon)
 freeVars : Term -> Set String
@@ -134,8 +128,77 @@ substSt t (x,e) = subst' t
     where fvs : Set String
           fvs = freeVars e
           subst' : Term -> St Maybe Int Term
-          subst' (Con y) = pure y
-          subst' (Var y) = pure (if x == y then e else y)
-          subst' (App y z) = ?subst3
-          -- z? newvar!
-          subst' (Lam y e1) = ?subst4
+          subst' (Con y) = pure (Con y)
+          subst' (Var y) = if x == y then
+                            pure e
+                           else
+                            pure (Var y)
+          subst' (App y z) = do y' <- subst' y
+                                z' <- subst' z
+                                pure (App y' z')
+          subst' (Lam y e1) = if x == y then
+                                pure (Lam y e1)
+                              else if mem y fvs then 
+                                do z <- newVar
+                                   e' <- substSt e1 (y, Var z)
+                                   e'' <- subst' e'
+                                   pure (Lam z e'')
+                              else
+                                do e1' <- subst' e1
+                                   pure (Lam y e1')
+                
+canContract : Term -> Bool
+canContract (App (Lam x z) y)                       = True
+canContract (App (App (Var "add") (Con z)) (Con y)) = True
+canContract _                                       = False
+
+contract : Term -> St Maybe Int Term
+contract (App (Lam x z) y)                       = substSt z (x, y)
+contract (App (App (Var "add") (Con z)) (Con y)) = pure (Con (z+y))
+contract _                                       = fail
+
+focusA : Term -> Maybe (Term, Term -> Term)
+focusA (App x y) = 
+    case focusA x of
+        Just (r,c) => Just (r, \ t => App (c t) y)
+        Nothing =>
+            case focusA y of
+                Just (r,c) => Just (r, \ t => App x (c t))
+                Nothing =>
+                    if canContract (App x y) then
+                        Just (App x y, \ t => t)
+                    else
+                        Nothing
+focusA (Lam x y) = 
+    case focusA y of
+        Just (r,c) => Just (r, \ t => Lam x (c t))
+        Nothing => Nothing
+focusA (Var x) = Nothing
+focusA (Con x) = Nothing
+
+-- todo: make it work
+focusN : Term -> Maybe (Term, Term -> Term)
+focusN (App x y) = 
+    case focusN x of
+        Just (r,c) => Just (r, \ t => App (c t) y)
+        Nothing =>
+            case focusN y of
+                Just (r,c) => Just (r, \ t => App x (c t))
+                Nothing =>
+                    if canContract (App x y) then
+                        Just (App x y, \ t => t)
+                    else
+                        Nothing
+focusN (Lam x y) = 
+    case focusN y of
+        Just (r,c) => Just (r, \ t => Lam x (c t))
+        Nothing => Nothing
+focusN (Var x) = Nothing
+focusN (Con x) = Nothing
+
+step : (Term -> Maybe (Term, Term -> Term)) -> Term -> St Maybe Int Term
+step focus t = 
+    case focus t of
+        Just (r, c) => do r' <- contract r
+                          pure (c r')
+        Nothing => fail
