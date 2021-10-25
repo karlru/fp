@@ -34,10 +34,13 @@ tS : Term    -- show tS == "\ a. \ b. \ c. a c (b c)"
 tS = Lam "a" (Lam "b" (Lam "c"
         (App (App (Var "a") (Var "c"))
             (App (Var "b") (Var "c")))))
- 
+
+test0 : Term
+test0 = App (Lam "x" (App (Var "x") (Var "x"))) (App (Lam "x" (Var "x")) (Lam "x" (Var "x")))
+
 test : Term   -- "(\ a. \ b. \ c. a c (b c)) (\ a. a) (\ a. a) (\ a. a)"
 test = App (App (App tS tI) tI) tI
- 
+
 test1 : Term  -- "(\ a. a) ((\ b. b) (\ c. c))"
 test1 = (Lam "a" (Var "a")) `App`
     ((Lam "b" (Var "b")) `App` (Lam "c" (Var "c")))
@@ -178,19 +181,9 @@ focusA (Con x) = Nothing
 
 -- todo: make it work
 focusN : Term -> Maybe (Term, Term -> Term)
-focusN (App x y) = 
-    case focusN x of
-        Just (r,c) => Just (r, \ t => App (c t) y)
-        Nothing =>
-            case focusN y of
-                Just (r,c) => Just (r, \ t => App x (c t))
-                Nothing =>
-                    if canContract (App x y) then
-                        Just (App x y, \ t => t)
-                    else
-                        Nothing
+focusN (App x y) = ?rhs
 focusN (Lam x y) = 
-    case focusN y of
+    case focusN x of
         Just (r,c) => Just (r, \ t => Lam x (c t))
         Nothing => Nothing
 focusN (Var x) = Nothing
