@@ -29,8 +29,15 @@ yl2 : Eq a => Puu (Int, a) -> a -> List Int
 yl2 p y = lahenda p y []
 where
     lahenda : Puu (Int, a) -> a -> List Int -> List Int
-    lahenda Leht0 y l          = l
-    lahenda (Leht1 (i, x)) y l = if x == y then i :: l else l
+    lahenda Leht0 y l             = l
+    lahenda (Leht1 (i, x)) y l    = 
+        if x == y then 
+            i :: l
+        else l
+    lahenda (Haru n (i, x) m) y l = 
+        if x == y then 
+            lahenda n y (i::l) ++ lahenda m y l
+        else lahenda n y l ++ lahenda m y l
 
 -- NÃ¤iteks:
 -- yl2 (Haru Leht0 (1, 'a') (Leht1 (2, 'b'))) 'a' == [1]
@@ -51,7 +58,17 @@ interface Veider a where
 -- a) g 'x' == 10
 -- b) f True + f 1 == g 'x'
 
+Veider Char where
+    f x = 10
+    g x = ?rhs
 
+Veider Bool where
+    f x = 5
+    g x = False
+
+Veider Integer where
+    f x = 5
+    g x = 10
 
 -- Ãœlesanne 4:
 
@@ -78,10 +95,6 @@ yl4 = do
                 putChar x
                      else putChar x
             prindi xs
-
--- Main> :exec yl4
--- Kalmer
--- KKalmmeerr
 
 -- Main> :exec yl4
 -- Tere hommikust!
