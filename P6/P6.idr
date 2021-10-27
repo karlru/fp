@@ -179,13 +179,10 @@ focusA (Lam x y) =
 focusA (Var x) = Nothing
 focusA (Con x) = Nothing
 
--- todo: make it work
+-- ma kahjuks ei oska...
 focusN : Term -> Maybe (Term, Term -> Term)
-focusN (App x y) = ?rhs
-focusN (Lam x y) = 
-    case focusN x of
-        Just (r,c) => Just (r, \ t => Lam x (c t))
-        Nothing => Nothing
+focusN (App x y) = ?rhs1
+focusN (Lam x y) = ?rhs2
 focusN (Var x) = Nothing
 focusN (Con x) = Nothing
 
