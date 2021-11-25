@@ -1,0 +1,195 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\begin{document}
+
+Esimene ülesanne
+
+\begin{displaymath}
+\dfrac{
+	\dfrac{
+		\dfrac{
+		}{
+			\{a:\alpha, x:\alpha\}\vdash \, x :\,\alpha
+		}
+	}{
+		\{a:\alpha\}\vdash \, (\lambda x:\alpha. x) :\, \alpha\to\alpha
+	} 
+	\quad
+	\dfrac{
+	}{
+		\{a:\alpha\}\vdash \, a:\,\alpha
+	}
+}{
+	\{a : \alpha\} \vdash (\lambda x:\alpha. x)\, a :\, \alpha
+}
+\end{displaymath}
+
+Teine ülesanne
+
+\begin{displaymath}
+\dfrac{
+	\dfrac{
+		\{x:\alpha\}\vdash x\,x:?
+	}{
+		\vdash (\lambda x:\alpha. x\,x)\,:?
+	}
+		\quad
+		\dfrac{
+			\dfrac{
+				\dfrac{
+				}{
+					\{x:\alpha\}\vdash x:\,\alpha
+				}
+				\quad
+				\dfrac{
+				}{
+					\{x:\alpha\}\vdash x:\,\alpha
+				}
+		}{
+			\{x:\alpha\}\vdash x\,x:?}}{\vdash (\lambda x:\alpha. x\,x)\,:\,?
+		}
+}{
+	\vdash (\lambda x:\alpha. x\,x)\,(\lambda x:\alpha. x\,x) :\,?
+}
+\end{displaymath}
+Ei saa lahendada, aplikatsioon ei tule kujul $muutuja\to muutuja$
+
+\\~\\
+
+Kolmas ülesanne
+
+\begin{displaymath}
+\resizebox{1.1 \textwidth}{!}
+{
+\dfrac{
+	\dfrac{
+		\dfrac{
+			\dfrac{
+				\dfrac{
+					\dfrac{
+					}{
+						\{x:\alpha, y:\alpha\to\beta\to\gamma, z:\alpha\}\vdash y:\,\alpha\to\beta\to\gamma
+					}
+				}{
+					\{x:\alpha, y:\alpha\to\beta\to\gamma\}\vdash (\lambda z:\alpha. y):\,\alpha\to\alpha\to\beta\to\gamma
+				}
+				\quad
+				\dfrac{
+				}{
+					\{x:\alpha, y:\alpha\to\beta\to\gamma\}\vdash x:\,\alpha
+				}
+			}{
+				\{x:\alpha, y:\alpha\to\beta\to\gamma\}\vdash  (\lambda z:\alpha. y)\,x :\, \alpha\to\beta\to\gamma
+			}
+			\quad
+			\dfrac{
+			}{
+				\{x:\alpha, y:\alpha\to\beta\to\gamma\}\vdash  x :\, \alpha
+			}
+		}{
+			\{x:\alpha, y:\alpha\to\beta\to\gamma\}\vdash  (\lambda z:\alpha. y)\,x\,x :\, \beta\to\gamma
+		}
+	}{
+		\{x:\alpha\}\vdash (\lambda y:\alpha\to\beta\to\gamma. (\lambda z:\alpha. y)\,x\,x) :\, \beta\to\gamma
+	}
+}{
+	\vdash (\lambda x:\alpha,\, y:\alpha\to\beta\to\gamma. (\lambda z:\alpha. y)\,x\,x) :\, \beta\to\gamma
+}
+}
+\end{displaymath}
+
+Neljas ülesanne
+
+\begin{displaymath}
+\dfrac{
+	\dfrac{
+		\dfrac{
+			\dfrac{
+				\dfrac{
+					\dfrac{
+						\dfrac{
+						}{
+							G\vdash z:\,\alpha\to(\beta\to\alpha)\to(\beta\to\beta)
+						}
+						\quad
+						\dfrac{
+							\dfrac{
+							}{
+								G\cup\{w:\beta\}\vdash x:\,\alpha
+							}
+						}{
+							G\vdash(\lambda w:\beta. x):\, \beta\to\alpha
+						}
+					}{
+						G\vdash z\,(\lambda w:\beta. x):\, ?
+					}
+					\quad
+					\dfrac{
+					}{
+						G\vdash y: \beta
+					}
+				}{
+					G\vdash z\,(\lambda w:\beta. x)\,y:\, ?
+				}
+			}{
+				\{x:\alpha, y:\beta, z:\alpha\to(\beta\to\alpha)\to(\beta\to\beta)\}\vdash z\,(\lambda w:\beta. x)\,y :\, ?
+			}
+		}{
+			\{x:\alpha, y:\beta\}\vdash (\lambda z:\alpha\to(\beta\to\alpha)\to(\beta\to\beta). z\,(\lambda w:\beta. x)\,y) :\, ?
+		}
+	}{
+		\{x:\alpha\}\vdash (\lambda y:\beta, z:\alpha\to(\beta\to\alpha)\to(\beta\to\beta). z\,(\lambda w:\beta. x)\,y) :\, ?
+	}
+}{
+	\vdash (\lambda x:\alpha,\, y:\beta, z:\alpha\to(\beta\to\alpha)\to(\beta\to\beta). z\,(\lambda w:\beta. x)\,y) :\, ?
+}
+\end{displaymath}
+Ei saa lahendada, $z$ argumendi tüüp ei klapi $\lambda w:\beta. x$ omaga
+
+\newpage
+Viies ülesanne
+
+\begin{displaymath}
+\resizebox{1.1 \textwidth}{!}
+{
+\dfrac{
+	\dfrac{
+		\dfrac{
+			\dfrac{
+				\dfrac{
+					\dfrac{
+					}{
+						\{x:\alpha, y:\alpha\to\beta,f:(\alpha\to\beta)\to\alpha\to\beta \}\vdash f:\,(\alpha\to\beta)\to\alpha\to\beta 
+					}
+				}{
+					\{x:\alpha, y:\alpha\to\beta \}\vdash (\lambda f:(\alpha\to\beta)\to\alpha\to\beta. f):\,(\alpha\to\beta)\to\alpha\to\beta 
+				}
+				\quad
+				\dfrac{
+				}{
+					\{x:\alpha, y:\alpha\to\beta \}\vdash y:\,\alpha\to\beta
+				}
+			}{
+				\{x:\alpha, y:\alpha\to\beta \}\vdash (\lambda f:(\alpha\to\beta)\to\alpha\to\beta. f)\, y:\,\alpha\to\beta
+			}
+			\quad
+			\dfrac{
+			}{
+				\{x:\alpha, y:\alpha\to\beta \}\vdash x:\,\alpha
+			}
+		}{
+			\{x:\alpha, y:\alpha\to\beta \}\vdash (\lambda f:(\alpha\to\beta)\to\alpha\to\beta. f)\, y\, x\, :\, \beta
+		}
+	}{
+		\{x:\alpha\}\vdash \lambda y:\alpha\to\beta. (\lambda f:(\alpha\to\beta)\to\alpha\to\beta. f)\, y\, x\, :\,\beta
+	}
+}{
+	\vdash \lambda x:\alpha, y:\alpha\to\beta. (\lambda f:(\alpha\to\beta)\to\alpha\to\beta. f)\, y\, x\, :\, \beta
+}
+}
+\end{displaymath}
+
+\end{document}
