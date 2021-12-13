@@ -15,14 +15,14 @@ xyz : punkt 3
 xyz = (3.0,6.0,3.0)
 
 nullpunkt : (d : Nat) -> punkt d
-nullpunkt Z     = ()
-nullpunkt (S Z) = 0.0
-nullpunkt (S k) = ?rhs_null
+nullpunkt Z         = ()
+nullpunkt (S Z)     = 0.0
+nullpunkt (S (S k)) = (0.0, (nullpunkt (S k)))
 
 add: (d:Nat) -> punkt d -> punkt d -> punkt d
-add Z () ()   = ()
-add (S Z) x y = x + y
-add (S k) x y = ?rhs_2
+add Z () ()       = ()
+add (S Z) x y     = x + y
+add (S (S k)) (x, xs) (y, ys) =  (x+y, (add (S k) xs ys))
 
 sum : (d : Nat) -> List (punkt d) -> punkt d
 

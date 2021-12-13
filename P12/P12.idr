@@ -4,7 +4,6 @@ import Control.App
 import Control.App.Console
 import Random
  
- 
 %hide Builtin.(#)
 %hide Builtin.DPair.(#)
  
@@ -137,7 +136,7 @@ loop a pivot j hi i =
  
 test_loop : (List Double, Nat)
 test_loop =
-    let 1 a     = newLinArr [1,3,2,7,4]
+    let 1 a     = newLinArr [0,1,4,5,3]
         a # i   = loop a 3 0 3 0  -- viimane element (pivot): 3
         () # al = toLst a         -- esimene indeks: 0
     in                            -- eelviimane indeks: 3
@@ -150,7 +149,7 @@ decr (S n) = n
 partition : Array arr => (1 a : arr) -> (lo: Nat) -> (hi: Nat) -> L arr Nat
 partition a lo hi = 
     let a # pivot = read a hi
-        a # i     = loop a pivot lo (decr hi) lo
+        a # i     = loop a pivot lo hi lo
         a         = swap a i hi
     in a # i
 
@@ -164,11 +163,14 @@ test_part =
 
 qs : Array arr => (1 a : arr) -> (lo: Nat) -> (hi: Nat) -> arr
 qs a lo hi = 
-    if lo >= hi then 
+    if (lo >= hi) then 
         a
     else
-        ?hole
- 
+        let a # pivot_index = partition a lo hi
+            a               = qs a lo (decr pivot_index)
+            a               = qs a (pivot_index + 1) hi
+        in a
+
 quickSort : Array arr => (1 _ : arr) -> arr
 quickSort a =
     let a # len = size a in
@@ -179,8 +181,7 @@ test_qs =
     let 1 a = newLinArr [5,4,7,6,1,2]
         a   = quickSort a
         () # al = toLst a
-    in
-    al
+    in al
 
 public export
 interface MyHasIO world where
@@ -214,23 +215,56 @@ prog1 w =
     in 
         w # ()
 
--- no good
-printArray: (MyHasIO wrld, Array arr)=> (1 a: arr) -> (1 w: wrld) -> LL wrld arr
+printArray : (MyHasIO wrld, Array arr)=> (1 a: arr) -> (1 w: wrld) -> LL wrld arr
 printArray a w = 
     let a # l  = size a
         w ## a = printElem w a l
     in w ## a
         where printElem : (1 w: wrld) -> (1 a: arr) -> Nat -> LL wrld arr
+              printElem w a 1 = 
+                    let a # ai = read a 0
+                        w      = writeConsole w (cast ai)
+                    in w ## a
               printElem w a n = 
-                let
-                    w ## a = printArray a w
-                    a # ai = read a n
-                    w      = writeConsole w (cast ai)
-                in w ## a
+                    let w ## a = printElem w a (decr n)
+                        a # ai = read a (decr n)
+                        w      = writeConsole w (cast ai)
+                    in w ## a
  
 testPrint : MyHasIO wrld =>  (1 w: wrld) -> L wrld ()
 testPrint w =
     let 1 a    = newLinArr [1,2,3,4]
         w ## a = printArray a w
         ()     = delArr a
+    in w # ()
+
+fillArray: (MyHasIO wrld, Array arr)=> (1 a: arr) -> (1 w: wrld) ->
+    (lo:Nat) -> (hi:Nat) -> LL wrld arr
+fillArray a w lo hi = 
+    if lo == hi then
+        let w # v = readConsole w
+            a     = write a lo (cast v) 
+        in w ## a
+    else
+        let w # v  = readConsole w
+            a      = write a lo (cast v)
+            w ## a = fillArray a w (lo+1) hi
+        in w ## a
+ 
+testFill : MyHasIO wrld =>  (1 w: wrld) -> L wrld ()
+testFill w =
+    let 1 a    = newLinArr [1,2,3,4]
+        w ## a = fillArray a w 0 3
+        w      = writeConsole w "------"
+        w ## a = printArray a w
+        ()     = delArr a
+    in w # ()
+
+testSort :  MyHasIO wrld =>  (1 w: wrld) -> L wrld ()
+testSort w = 
+    let 1 a     = newLinArr [1,2,3,4]
+        w ## a  = fillArray a w 0 3
+        1 s     = quickSort a
+        w ## s  = printArray s w
+        ()      = delArr s
     in w # ()

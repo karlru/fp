@@ -1,0 +1,253 @@
+%default total
+ 
+-- 1) leia kõik reedeksid
+-- 
+-- a) (λf. f((λx.x) 3)) (λx.x)
+--           --------
+--    ------------------------     
+ 
+ 
+-- b) (λf. (λy. (λx.x) y) x)
+ 
+-- c) (λa. (λb. c) a) ((λx.x) c)
+ 
+ 
+-- 2) beeta-redutseeri normaalkujule normaal- ja aplikatiivjärjekorras
+-- 
+ 
+-- a) (λf. (λg. g f)) ((λx.x) a) (λx.b)
+-- N: (λf. (λg. g f)) ((λx.x) a) (λx.b)
+--    --> (λg. g ((λx.x) a))  (λx.b)
+--    --> (λx.b) ((λx.x) a) 
+--    --> b
+-- A: (λf. (λg. g f)) ((λx.x) a) (λx.b)
+--    --> (λf. (λg. g f)) a (λx.b)
+--    --> (λg. g a) (λx.b)
+--    --> (λx.b) a 
+--    --> a
+ 
+-- b) (λx. (λx.x)) ((λx. x) x)
+ 
+-- c) (λf. f f f) ((λx.x) (λx.b))
+ 
+ 
+-- 3) tüübi tuletamine
+-- "Joonista" tüübituletuspuu, kirjuta välja kõik kitsendused ja
+-- lahenda kogu avaldise tüüp ɣ2.
+-- 
+-- Lihtsustuseks:
+--  * ei pea kirjutama xᵅ ∈ Γ
+--  * kitsendusi ei pea kirjutama puu sisse  (mis oli slaididel roheline)
+-- 
+-- a) ⊢ (λxᵅ¹. ((λyᵅ². yᵅ³)ˠ¹ xᵅ⁴)ᵝ¹)ˠ¹
+ 
+-- -------------
+-- xᵅ¹,yᵅ² ⊢ yᵅ³
+-----------------------    ----------  
+-- xᵅ¹ ⊢ (λyᵅ². yᵅ³)ˠ¹     xᵅ¹ ⊢ xᵅ⁴
+-- ----------------------------------
+-- xᵅ¹ ⊢ ((λyᵅ². yᵅ³)ˠ¹ xᵅ⁴)ᵝ¹
+-- -------------------------------
+-- (λxᵅ¹. ((λyᵅ². yᵅ³)ˠ¹ xᵅ⁴)ᵝ¹)ˠ²
+ 
+-- ɑ2=ɑ3, ɣ1=ɑ2→ɑ3, ɑ1=ɑ4, ɣ1=ɑ4→β1, ɣ2=ɑ1→β1
+ 
+-- Lahendus: ɣ2 = ɑ→ɑ
+ 
+ 
+-- b) ⊢ (λxᵅ¹. (xᵅ² (λyᵅ³. yᵅ⁴)ˠ¹)ᵝ¹)ˠ²
+ 
+-- c) ⊢ (λxᵅ¹. ((λyᵅ². (λzᵅ³. yᵅ⁴)ˠ¹)ˠ³ xᵅ⁵)ᵝ¹)ˠ²
+ 
+-- d) ⊢ (λxᵅ¹. ((λyᵅ². (λzᵅ³. zᵅ⁴)ˠ¹)ˠ³ xᵅ⁵)ᵝ¹)ˠ²
+ 
+ 
+ 
+ 
+-- 4) sõltuvate tüüpidega programmeerimine
+ 
+data Vect : Nat -> Type -> Type where
+    Nil  : Vect 0 a
+    (::) : a -> Vect n a -> Vect (1+n) a
+ 
+topelt : Nat -> Nat
+topelt 0 = 0
+topelt (S k) = S (S (topelt k))
+ 
+-- ex1 -- pane elemendid vaheldumisi  (NB! Kalmeril siin plugin juksib.)
+sega : Vect n a -> Vect n a -> Vect (topelt n) a
+sega [] []               = []
+sega (x :: xs) (y :: ys) = x :: y :: (sega xs ys)
+ 
+-- Main> sega [1,2,3] [30,20,10]
+-- [1, 30, 2, 20, 3, 10]
+
+concat : Vect n a -> Vect m a -> Vect (n+m) a
+concat [] ys        = ys
+concat (x :: xs) ys = x :: concat xs ys
+ 
+-- ex2 -- lamenda tabel
+flatten : Vect n (Vect m a) -> Vect (n*m) a
+flatten []       = []
+flatten (x :: y) = Main.concat x (flatten y)
+ 
+-- Main> flatten [[1,2,3],[30,20,10]]
+-- [1, 2, 3, 30, 20, 10]
+ 
+-- ex3 -- viimane element
+last : Vect (S n) a -> a
+last (x :: y) = ?last_r_1
+ 
+-- Main> last [1,2,3]
+-- 3
+ 
+-- ex4 -- korda n korda
+repeat : (n:Nat) -> a -> Vect n a
+repeat n x = ?repeat_r
+ 
+-- Main> repeat 3 'a'
+-- ['a', 'a', 'a']
+ 
+-- ex5 -- lisa kõigile üks ette
+appendAll : (n:Nat) -> Vect n a -> Vect n (Vect m a) -> Vect n (Vect (S m) a)
+appendAll n xs yss = ?appendAll_r
+ 
+-- Main> appendAll 3 [1,2,3] [[30],[20],[10]]
+-- [[1, 30], [2, 20], [3, 10]]
+ 
+-- ex6 -- transponeeri
+transpose : (n:Nat) -> (m:Nat) -> Vect n (Vect m a) -> Vect m (Vect n a)
+transpose n m xss = ?transpose_r
+ 
+-- Main> transpose 3 2 [[1,2],[3,4],[5,6]]
+-- [[1, 3, 5], [2, 4, 6]]
+ 
+ 
+ 
+-- 5) tõestamine Idris2-s
+ 
+infixl 10 /\
+data (/\) : Type -> Type -> Type where
+    ConI : a -> b
+        ------
+        -> a /\ b
+ 
+infixl 11 \/
+data (\/) : Type -> Type -> Type where
+    DisjIl :   a
+            ------
+        -> a \/ b
+ 
+    DisjIr :   b
+            ------
+        -> a \/ b
+ 
+VoidE : Void
+        ----
+    ->    b
+VoidE q impossible
+ 
+--ex7 -- lausearvutus
+test1 : (a \/ b) /\ (a -> b)
+        --------------------
+    ->          b
+test1 = ?test1_r
+ 
+--ex8 -- lausearvutus
+test2 : (a \/ b \/ c) /\ (b -> c)
+        -------------------------
+    ->         (a \/ c)
+test2 = ?test2_r
+ 
+ 
+-- tuleb kasuks test3-s
+mult0 : (k:Nat) -> 0 = k*0
+mult0 0 = Refl
+mult0 (S k) = mult0 k
+ 
+-- NB! Nat ei ole tegelikult piiratur ressurss.
+add : (1 _ : Nat) -> (1 _: Nat) -> Nat
+add x 0 = x
+add 0 (S k) = S k
+add (S j) (S k) = 2+j+k
+ 
+mul : (1 _ : Nat) -> (1 _: Nat) -> Nat
+mul 0 0 = 0
+mul (S k) 0 = 0
+mul 0 (S k) = 0
+mul (S j) (S k) = (S j)*(S k)
+ 
+--ex9 -- mul on korrutamine
+test3 : (a:Nat) -> (b:Nat)
+        ------------------
+    ->     mul a b = a*b
+test3 0 0 = Refl
+test3 0 (S k) = Refl
+test3 (S k) 0 = mult0 k
+test3 (S k) (S j) = Refl
+ 
+--ex9 -- liitmisel S paremal
+plus_n_Sm : (n:Nat)  ->  (m:Nat)
+            --------------------
+         -> n + (S m) = S (n+m)
+plus_n_Sm 0 m     = Refl
+plus_n_Sm (S k) m = 
+    rewrite plus_n_Sm k m in Refl
+ 
+ 
+--ex10 -- topelt n arvutab n+n
+topeltOk :    (n:Nat)
+            --------------
+        -> topelt n = n+n
+topeltOk n = ?topeltOk_r
+ 
+--ex11 -- foldr (::) [] on identsusfunktsioon
+foldr_id : (xs:List a) -> foldr (::) [] xs = xs
+foldr_id xs = ?foldr_id_r
+ 
+-- 6) lineaarsed tüübid
+ 
+namespace Lin
+    public export
+    data List : Type -> Type where
+        Nil  : Lin.List a
+        (::) : (1 _ : a) -> (1 _ : Lin.List a) -> Lin.List a
+ 
+--ex12 -- rakendab funktsioonid järjest
+seqL : (1 _: Lin.List ((1 _ : a) -> a)) -> (1 _: a) -> a
+seqL fs x = ?seqL_r
+ 
+-- Main> seqL [add 1, add 2] 0
+-- 3
+-- Main> seqL [add 3, mul 0, add 4] 0
+-- 4
+ 
+--ex13 -- foldr, kus akumulaator on lineaarne
+foldLf : ((1 _: a) -> b -> a) -> Prelude.List b -> (1 _: a) -> a
+foldLf f xs y = ?foldLf_r
+ 
+-- Main> foldLf (\ x, y => add x y) [1,3] 0
+-- 4
+-- Main> foldLf (\ x, y => add x y) [2,3] 1
+-- 6
+ 
+--ex14 -- foldr, kus akumulaator ja list on lineaarsed
+foldLl : ((1 _ : a) -> (1 _ : b) -> a) -> (1 _ : Lin.List b) -> a -> a
+foldLl f xs y = ?foldLl_r
+ 
+-- Main> foldLf (\ x, y => mul x y) [2,0] 1
+-- 0
+-- Main> foldLf (\ x, y => mul x y) [2,5] 1
+-- 10
+ 
+append : (1 _ : Lin.List a) -> (1 _ : Lin.List a) -> Lin.List a
+append xs ys = ?append_r
+ 
+--ex15 -- lineaarse listi lamendamine
+concatL : (1 _ : Lin.List (Lin.List a)) -> Lin.List a
+concatL xss = ?concatL_r
+ 
+-- Main> concatL [[],[],[]]
+-- []
+-- Main> concatL [[1,2,3],[],[4,5]]
+-- [1, 2, 3, 4, 5]
